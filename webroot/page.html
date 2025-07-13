@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta charset="UTF-8" />
+    <title>Community Event Scheduler</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      #btn-create-event { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER NOT NEEDED
+      <header class="header">
+        <h1>Community Event Scheduler</h1>
+        <p>Welcome, <span id="username">Guest</span>!</p>
+      </header> -->
+
+      <nav class="nav">
+        <button id="btn-view-events" class="nav-btn active">View Events</button>
+        <button id="btn-create-event" class="nav-btn">Create Event</button>
+      </nav>
+
+      <!-- View Events Section -->
+      <div id="view-events" class="section active">
+        <div class="section-header">
+          <h2>Upcoming Events</h2>
+          <div class="filter-controls">
+            <select id="category-filter">
+              <option value="">All Categories</option>
+              <option value="AMA">AMA</option>
+              <option value="Watch Party">Watch Party</option>
+              <option value="Game Night">Game Night</option>
+              <option value="Discussion">Discussion</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div id="events-list" class="events-list">
+          <p class="no-events">No events scheduled yet. Create the first one!</p>
+        </div>
+      </div>
+
+      <!-- Create Event Section -->
+      <div id="create-event" class="section">
+        <h2>Create New Event</h2>
+        <div id="event-form" class="event-form">
+          <div class="form-group">
+            <label for="event-title">Event Title *</label>
+            <input type="text" id="event-title" maxlength="100" placeholder="Enter event title">
+          </div>
+          
+          <div class="form-group">
+            <label for="event-description">Description</label>
+            <textarea id="event-description" rows="4" maxlength="500" placeholder="Describe your event..."></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="event-start">Start Date & Time *</label>
+              <input type="datetime-local" id="event-start">
+            </div>
+            
+            <div class="form-group">
+              <label for="event-end">End Date & Time</label>
+              <input type="datetime-local" id="event-end">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="event-location">Location/Platform</label>
+            <input type="text" id="event-location" maxlength="200" placeholder="e.g., Discord, Reddit Live, Zoom link">
+          </div>
+          
+          <div class="form-group">
+            <label for="event-category">Category *</label>
+            <select id="event-category">
+              <option value="">Select category</option>
+              <option value="AMA">AMA</option>
+              <option value="Watch Party">Watch Party</option>
+              <option value="Game Night">Game Night</option>
+              <option value="Discussion">Discussion</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-primary">Create Event</button>
+            <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="application/javascript" src="script.js"></script>
+  </body>
+</html>
+
