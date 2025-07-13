@@ -4,7 +4,7 @@ A comprehensive event management tool for Reddit communities that allows moderat
 
 ## Features
 
-- **Event Creation**: Create detailed events with title, description, date/time, location, and category
+- **Event Creation (moderators only)**: Create detailed events with title, description, date/time, location, and category
 - **Interactive Event Display**: View events with countdown timers, RSVP functionality, and status indicators
 - **RSVP System**: Users can RSVP to events and track attendance
 - **Event Categories**: Organize events by type (AMA, Watch Party, Game Night, Discussion, Other)
@@ -16,7 +16,7 @@ A comprehensive event management tool for Reddit communities that allows moderat
 
 1. **For Moderators**: Use the "Create Community Event Scheduler" menu item in your subreddit to create a new event scheduler post
 2. **For Users**: Click "Open Event Scheduler" on any event scheduler post to view and interact with events
-3. **Creating Events**: Use the "Create Event" tab to add new events with all necessary details
+3. **Creating Events (moderators only)**: Use the "Create Event" tab to add new events with all necessary details
 4. **Participating**: RSVP to events you're interested in and receive updates about event status
 
 ## Event Categories
@@ -44,4 +44,3 @@ A comprehensive event management tool for Reddit communities that allows moderat
 - Secure user authentication through Reddit's API
 
 This app enhances community interaction by providing a structured way to organize and participate in events, making it easier for communities to stay engaged and connected.
-

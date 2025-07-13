@@ -63,7 +63,7 @@ The Community Event Scheduler is designed to enhance community engagement by pro
 
 ### Data Model
 ```typescript
-interface Event {
+export type Event = {
   id: string;
   title: string;
   description: string;
@@ -75,33 +75,23 @@ interface Event {
   rsvps: RSVP[];
   createdAt: string;
 }
+
+export type RSVP = {
+  userId: string;
+  timestamp: string;
+}
 ```
-
-## 📋 Developer Funds Compliance
-
-This app has been specifically designed to qualify for Reddit's Developer Funds 2025 program:
-
-### Program Requirements Met
-- **New Experience**: Provides novel event management functionality not natively available
-- **Community Enhancement**: Directly facilitates community engagement and organization
-- **Quality of Life**: Streamlines event planning for moderators and participation for users
-- **Broad Appeal**: Applicable across diverse subreddit types and communities
-
-### Engagement Metrics
-- **Qualified Installs**: Targets active communities with 1000+ members
-- **Daily Engagers**: Interactive features drive consistent user engagement
-- **Community Value**: Addresses real needs in community organization and participation
 
 ## 🛡️ Compliance & Safety
 
-### Devvit Rules Adherence
+### Compliance
 - ✅ Provides discrete, valuable functionality
 - ✅ Clear naming and accurate descriptions
 - ✅ Proper data handling and user privacy
 - ✅ No collection of sensitive information
 - ✅ Implements content validation and reporting mechanisms
 
-### Safety Features
+### Safety
 - Input validation prevents harmful content
 - User data limited to Reddit usernames for RSVP functionality
 - Proper error handling with user-friendly feedback
@@ -126,35 +116,30 @@ event-scheduler/
 
 ### Testing
 - Run `devvit playtest <subreddit>` for live testing
-- Use `test.html` for standalone UI testing
 - Monitor with `devvit logs <subreddit>`
 
 ### Building
 The app uses TypeScript and is built automatically by the Devvit platform during upload.
 
-## 📖 Documentation
+## Future Improvements
 
-- [Deployment Guide](deployment_guide.md) - Comprehensive deployment instructions
-- [App Plan](devvit_app_plan.md) - Detailed technical specifications
-- [Research](devvit_research.md) - Platform research and requirements analysis
+- Show list of users who have RSVP'd to an event
+- Allow users to un-rsvp from events
+- Moderators should be able to update/add/delete event categories
+- Add support for event reminders
+- Add support for recurring events
+- Support for updating event details
+- Option to upload event images (banner)
 
-## 🤝 Contributing
 
-This app was developed as part of a Reddit Developer Funds application. For questions or support:
-
-1. Check the documentation files
-2. Review the code comments for implementation details
-3. Test thoroughly before making changes
-4. Follow Devvit best practices and Reddit's developer guidelines
 
 ## 📄 License
 
-This project is licensed under the BSD-3-Clause License - see the LICENSE file for details.
+This project is licensed under the BSD-3-Clause License.
 
 ## 🎉 Acknowledgments
 
 - Built with Reddit's Devvit platform
-- Designed for the Reddit Developer Funds 2025 program
 - Created to enhance community engagement and organization
 
 ---
