@@ -8,9 +8,9 @@ Devvit.configure({
 });
 
 Devvit.addCustomPostType({
-  name: "Community Event Scheduler",
+  name: "Event Calendar",
   description: "Schedule events for your community",
-  height: "tall",
+  height: "regular",
   render: (context) => {
     // Fetch username
     const { data: username, loading: usernameLoading } = useAsync(
@@ -39,6 +39,12 @@ Devvit.addCustomPostType({
       const redisEvents = await context.redis.get(`events_${context.postId}`);
       return redisEvents ? JSON.parse(redisEvents) : [];
     });
+
+    // 3 upcoming events
+    const { data: top3UpcomingEvents = [], loading: top3UpcomingEventsLoading } = useAsync(async () => {
+      if (!events) return [];
+      return events.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()).slice(0, 3);
+    }, { depends: [events] });
 
     const webView = useWebView<WebViewMessage, DevvitMessage>({
       url: "page.html",
@@ -155,35 +161,49 @@ Devvit.addCustomPostType({
     return (
       <vstack
         grow
-        padding="large"
-        alignment="middle center"
-        gap="large"
+        height="100%"
+        width="100%"
+        padding="medium"
+        gap="medium"
         backgroundColor="neutral-background-weak"
         cornerRadius="medium"
       >
-        <hstack gap="medium" alignment="middle">
-          <icon name="calendar" size="large" color="action-primary" />
-          <text size="xlarge" weight="bold">
+        {/* <hstack gap="medium" alignment="middle">
+          <icon name="calendar" size="medium" color="neutral-content" />
+          <text size="large" weight="bold">
             Community Event Scheduler
           </text>
-        </hstack>
+        </hstack> */}
 
-        <vstack alignment="center" gap="small">
-          {/* <text size="large" color="text-weak">
-            Welcome, {username}!
-          </text> */}
-          <text size="medium" color="text-weak">
-            There are currently {events.length} events scheduled.
-          </text>
+        <text size="large" weight="bold" alignment="center middle" style="heading">Upcoming Events</text>
+        <hstack width="100%" height="2px" backgroundColor="neutral-border-weak" />
+        <spacer size="small" />
+
+        <vstack gap="medium" grow width="100%" height="100%">
+         {top3UpcomingEvents && top3UpcomingEvents.length > 0 ? (
+           <vstack alignment="start" gap="large" grow>
+             {top3UpcomingEvents.map((event: Event, index: number) => (
+               <hstack key={`${index}`} gap="medium">
+                 <icon name="calendar" size="small" color="neutral-content" />
+                 <text size="medium" weight="bold">
+                   {event.title}
+                 </text>
+               </hstack>
+             ))}
+           </vstack>
+         ) : (
+           <text>No upcoming events</text>
+         )}
         </vstack>
 
         <button
           appearance="primary"
+          size="small"
           onPress={() => {
             webView.mount();
           }}
         >
-          Open Scheduler
+          { isModerator ? "Manage Events" : "View Events" }
         </button>
       </vstack>
     );
