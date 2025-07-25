@@ -14,12 +14,6 @@
   </head>
   <body>
     <div class="container">
-      <!-- HEADER NOT NEEDED
-      <header class="header">
-        <h1>Community Event Scheduler</h1>
-        <p>Welcome, <span id="username">Guest</span>!</p>
-      </header> -->
-
       <nav class="nav">
         <button id="btn-view-events" class="nav-btn active">View Events</button>
         <button id="btn-create-event" class="nav-btn">Create Event</button>
@@ -28,18 +22,11 @@
       <!-- View Events Section -->
       <div id="view-events" class="section active">
         <div class="section-header">
-          <h2>Upcoming Events</h2>
           <div class="filter-controls">
-            <select id="category-filter">
-              <option value="">All Categories</option>
-              <option value="AMA">AMA</option>
-              <option value="Watch Party">Watch Party</option>
-              <option value="Game Night">Game Night</option>
-              <option value="Discussion">Discussion</option>
-              <option value="Other">Other</option>
-            </select>
+            <div id="category-filter-pills" class="category-pills"></div>
           </div>
         </div>
+        <div id="event-list"></div>
         <div id="events-list" class="events-list">
           <p class="no-events">No events scheduled yet. Create the first one!</p>
         </div>
@@ -99,4 +86,3 @@
     <script type="application/javascript" src="script.js"></script>
   </body>
 </html>
-
