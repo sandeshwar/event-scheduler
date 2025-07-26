@@ -43,7 +43,18 @@ Devvit.addCustomPostType({
     // 3 upcoming events
     const { data: top3UpcomingEvents = [], loading: top3UpcomingEventsLoading } = useAsync(async () => {
       if (!events) return [];
-      return events.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()).slice(0, 3);
+      const now = new Date().getTime();
+      return events
+        .filter(event => {
+          // An event is over only if it has an end time that is in the past.
+          if (event.endTime) {
+            return new Date(event.endTime).getTime() > now;
+          }
+          // If no end time, the event is not considered over.
+          return true;
+        })
+        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+        .slice(0, 3);
     }, { depends: [events] });
 
     const webView = useWebView<WebViewMessage, DevvitMessage>({
@@ -175,7 +186,7 @@ Devvit.addCustomPostType({
           </text>
         </hstack> */}
 
-        <text size="large" weight="bold" alignment="center middle" style="heading">Upcoming Events</text>
+        <text size="large" weight="bold" alignment="center middle" style="heading">Live & upcoming Events</text>
         <hstack width="100%" height="2px" backgroundColor="neutral-border-weak" />
         <spacer size="small" />
 
