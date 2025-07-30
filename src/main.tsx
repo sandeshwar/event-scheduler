@@ -1,5 +1,4 @@
-import "./createPost.js";
-import { Devvit, useWebView, useAsync } from "@devvit/public-api";
+import { Devvit, useWebView, useAsync, useState } from "@devvit/public-api";
 import type { DevvitMessage, WebViewMessage, Event } from "./message.js";
 
 Devvit.configure({
@@ -7,19 +6,38 @@ Devvit.configure({
   redis: true,
 });
 
+// Helper to format date
+const formatDate = (date: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+  return Intl.DateTimeFormat("en-US", options).format(new Date(date));
+};
+
 Devvit.addCustomPostType({
   name: "Event Calendar",
   description: "Schedule events for your community",
-  height: "regular",
+  height: "tall",
   render: (context) => {
+    const { postId } = context;
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
     // Fetch username
-    const { data: username, loading: usernameLoading } = useAsync(
-      async () => await context.reddit.getCurrentUsername() ?? "<anon>"
-    );
+    const { data: username, loading: usernameLoading } = useAsync(async () => {
+      const user = await context.reddit.getCurrentUser();
+      return user?.username ?? "<anon>";
+    });
 
     // Fetch subreddit name
     const { data: subredditName, loading: subredditLoading } = useAsync(
-      async () => await context.reddit.getCurrentSubredditName() ?? "<unknown>"
+      async () => {
+        const subreddit = await context.reddit.getCurrentSubreddit();
+        return subreddit?.name ?? "<unknown>";
+      }
     );
 
     // Fetch user object and check mod permissions
@@ -27,198 +45,261 @@ Devvit.addCustomPostType({
       async () => {
         if (!username || !subredditName) return false;
         const user = await context.reddit.getUserByUsername(username);
-        if (!user) return false;
-        const permissions = await user.getModPermissionsForSubreddit(subredditName);
+        if (!user) return false; // Check if user is undefined
+        const permissions = await user.getModPermissionsForSubreddit(
+          subredditName
+        );
         return Array.isArray(permissions) && permissions.length > 0;
       },
       { depends: [username, subredditName] }
     );
 
     // Load events from redis
-    const { data: events = [], loading: eventsLoading }: { data: Event[], loading: boolean } = useAsync(async () => {
-      const redisEvents = await context.redis.get(`events_${context.postId}`);
-      return redisEvents ? JSON.parse(redisEvents) : [];
-    });
+    const { data: events = [], loading: eventsLoading } = useAsync(
+      async () => {
+        const redisEvents = await context.redis.get(`events_${postId}`);
+        return redisEvents ? JSON.parse(redisEvents) : [];
+      },
+      { depends: [refreshTrigger] }
+    );
 
-    // 3 upcoming events
-    const { data: top3UpcomingEvents = [], loading: top3UpcomingEventsLoading } = useAsync(async () => {
-      if (!events) return [];
-      const now = new Date().getTime();
-      return events
-        .filter(event => {
-          // An event is over only if it has an end time that is in the past.
-          if (event.endTime) {
-            return new Date(event.endTime).getTime() > now;
-          }
-          // If no end time, the event is not considered over.
-          return true;
-        })
-        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-        .slice(0, 3);
-    }, { depends: [events] });
+    // Filter for live events
+    const { data: liveEvents = [] } = useAsync(
+      async () => {
+        if (!events) return [];
+        const now = new Date().getTime();
+        return events
+          .filter((event: Event) => {
+            const startTime = new Date(event.startTime).getTime();
+            const endTime = event.endTime
+              ? new Date(event.endTime).getTime()
+              : Infinity;
+            return startTime <= now && now < endTime;
+          })
+          .sort(
+            (a: Event, b: Event) =>
+              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+          );
+      },
+      { depends: [events] }
+    );
+
+    // Filter for upcoming events
+    const { data: upcomingEvents = [] } = useAsync(
+      async () => {
+        if (!events) return [];
+        const now = new Date().getTime();
+        return events
+          .filter((event: Event) => new Date(event.startTime).getTime() > now)
+          .sort(
+            (a: Event, b: Event) =>
+              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+          );
+      },
+      { depends: [events] }
+    );
 
     const webView = useWebView<WebViewMessage, DevvitMessage>({
       url: "page.html",
       async onMessage(message, webView) {
         switch (message.type) {
           case "webViewReady":
-            // Only send initial data if all required data is loaded
             if (
               usernameLoading ||
               subredditLoading ||
               modLoading ||
               eventsLoading
-            ) {
-              // Optionally, you could queue this or send a loading message
+            )
               return;
-            }
             webView.postMessage({
               type: "initialData",
-              data: {
-                username: username || "<anon>",
-                events,
-                isModerator: isModerator || false,
-              },
+              data: { username: username!, events, isModerator: isModerator! },
             });
             break;
           case "createEvent":
             const newEvent = {
               id: Date.now().toString(),
-              title: message.data.title,
-              description: message.data.description,
-              startTime: message.data.startTime,
-              endTime: message.data.endTime,
-              location: message.data.location,
-              category: message.data.category,
-              creator: username ?? '<anon>',
+              ...message.data,
+              creator: username ?? "<anon>",
               rsvps: [],
               createdAt: new Date().toISOString(),
             };
             const updatedEvents = [...events, newEvent];
             await context.redis.set(
-              `events_${context.postId}`,
+              `events_${postId}`,
               JSON.stringify(updatedEvents)
             );
-            webView.postMessage({
-              type: "eventCreated",
-              data: {
-                event: newEvent,
-                events: updatedEvents,
-              },
-            });
-            break;
-          case "rsvpEvent":
-            const eventId = message.data.eventId;
-            const updatedEventsWithRsvp = events.map((event) => {
-              if (event.id === eventId) {
-                // Avoid mutating the original event object
-                const rsvps = Array.isArray(event.rsvps) ? [...event.rsvps] : [];
-                if (!rsvps.find((rsvp) => rsvp.userId === username)) {
-                  rsvps.push({
-                    userId: username || '<anon>',
-                    timestamp: new Date().toISOString(),
-                  });
-                }
-                return { ...event, rsvps };
-              }
-              return event;
-            });
-            await context.redis.set(
-              `events_${context.postId}`,
-              JSON.stringify(updatedEventsWithRsvp)
-            );
-            webView.postMessage({
-              type: "rsvpUpdated",
-              data: {
-                events: updatedEventsWithRsvp,
-              },
-            });
+            setRefreshTrigger((t) => t + 1);
             break;
           case "deleteEvent":
-            const eventToDeleteId = message.data.eventId;
             const filteredEvents = events.filter(
-              (event) => event.id !== eventToDeleteId
+              (event: Event) => event.id !== message.data.eventId
             );
             await context.redis.set(
-              `events_${context.postId}`,
+              `events_${postId}`,
               JSON.stringify(filteredEvents)
             );
-            webView.postMessage({
-              type: "eventDeleted",
-              data: {
-                events: filteredEvents,
-              },
-            });
+            setRefreshTrigger((t) => t + 1);
             break;
-          default:
-            throw new Error(`Unknown message type: ${message satisfies never}`);
         }
-      },
-      onUnmount() {
-        // context.ui.showToast("Event Scheduler closed!");
       },
     });
 
-    // Render loading state if any data is still loading
     if (usernameLoading || subredditLoading || modLoading || eventsLoading) {
       return (
         <vstack grow padding="small">
-          <text>Loading...</text>
+          <text color="neutral-content-weak">Loading...</text>
         </vstack>
       );
     }
 
-    // Render the custom post type
     return (
       <vstack
-        grow
-        height="100%"
-        width="100%"
+        backgroundColor="neutral-background"
         padding="medium"
         gap="medium"
-        backgroundColor="neutral-background-weak"
-        cornerRadius="medium"
+        grow
       >
-        {/* <hstack gap="medium" alignment="middle">
-          <icon name="calendar" size="medium" color="neutral-content" />
-          <text size="large" weight="bold">
-            Community Event Scheduler
-          </text>
-        </hstack> */}
+        {/* Live Events Section */}
+        {liveEvents.length > 0 && (
+          <vstack gap="medium">
+            <spacer grow />
+            <text color="neutral-content-weak" size="small" weight="bold">
+              LIVE NOW
+            </text>
+            {liveEvents.map((event: Event) => (
+              <vstack
+                key={event.id}
+                padding="medium"
+                cornerRadius="medium"
+                backgroundColor="neutral-background-container"
+              >
+                <hstack alignment="top" gap="medium">
+                  <icon
+                    name="calendar"
+                    size="large"
+                    color="neutral-content-strong"
+                  />
+                  <vstack gap="medium" grow>
+                    <hstack alignment="middle">
+                      <text
+                        color="neutral-content-strong"
+                        size="large"
+                        weight="bold"
+                      >
+                        {event.title}
+                      </text>
+                      <spacer grow />
+                      <button appearance="destructive" size="small">
+                        LIVE NOW
+                      </button>
+                    </hstack>
+                    <hstack alignment="middle" gap="small">
+                      <icon
+                        name="location"
+                        size="small"
+                        color="neutral-content-weak"
+                      />
+                      <text color="neutral-content-weak" size="medium">
+                        {event.location}
+                      </text>
+                    </hstack>
+                    <hstack alignment="middle" gap="small">
+                      <icon
+                        name="calendar"
+                        size="small"
+                        color="neutral-content-weak"
+                      />
+                      <text color="neutral-content-weak" size="medium">
+                        {formatDate(event.startTime)}
+                      </text>
+                    </hstack>
+                  </vstack>
+                </hstack>
+              </vstack>
+            ))}
+          </vstack>
+        )}
 
-        <text size="large" weight="bold" alignment="center middle" style="heading">Live & upcoming Events</text>
-        <hstack width="100%" height="2px" backgroundColor="neutral-border-weak" />
-        <spacer size="small" />
+        {/* Upcoming Events Section */}
+        {upcomingEvents.length > 0 && (
+          <vstack gap="medium">
+            <spacer grow />
+            <text color="neutral-content-weak" size="small" weight="bold">
+              UPCOMING
+            </text>
+            <hstack gap="medium">
+              {upcomingEvents.slice(0, 2).map((event: Event) => (
+                <vstack
+                  key={event.id}
+                  padding="medium"
+                  cornerRadius="medium"
+                  backgroundColor="neutral-background-container"
+                  grow
+                >
+                  <hstack alignment="top" gap="medium">
+                    <icon
+                      name="calendar"
+                      size="medium"
+                      color="neutral-content-strong"
+                    />
+                    <vstack gap="medium" grow>
+                      <text
+                        color="neutral-content-strong"
+                        size="medium"
+                        weight="bold"
+                      >
+                        {event.title}
+                      </text>
+                      <hstack alignment="middle" gap="small">
+                        <icon
+                          name="location"
+                          size="small"
+                          color="neutral-content-weak"
+                        />
+                        <text color="neutral-content-weak" size="small">
+                          {event.location}
+                        </text>
+                      </hstack>
+                      <hstack alignment="middle" gap="small">
+                        <icon
+                          name="calendar"
+                          size="small"
+                          color="neutral-content-weak"
+                        />
+                        <text color="neutral-content-weak" size="small">
+                          {formatDate(event.startTime)}
+                        </text>
+                      </hstack>
+                    </vstack>
+                  </hstack>
+                </vstack>
+              ))}
+            </hstack>
+          </vstack>
+        )}
 
-        <vstack gap="medium" grow width="100%" height="100%">
-         {top3UpcomingEvents && top3UpcomingEvents.length > 0 ? (
-           <vstack alignment="start" gap="large" grow>
-             {top3UpcomingEvents.map((event: Event, index: number) => (
-               <hstack key={`${index}`} gap="medium">
-                 <icon name="calendar" size="small" color="neutral-content" />
-                 <text size="medium" weight="bold">
-                   {event.title}
-                 </text>
-               </hstack>
-             ))}
-           </vstack>
-         ) : (
-           <text>No upcoming events</text>
-         )}
-        </vstack>
+        {/* No Events State */}
+        {liveEvents.length === 0 && upcomingEvents.length === 0 && (
+          <vstack alignment="center" padding="large" grow>
+            <text color="neutral-content-strong" size="large" weight="bold">
+              No upcoming events
+            </text>
+            <text color="neutral-content-weak" size="medium">
+              Check back later!
+            </text>
+          </vstack>
+        )}
 
-        <button
-          appearance="primary"
-          size="small"
-          onPress={() => {
-            webView.mount();
-          }}
-        >
-          { isModerator ? "Manage Events" : "View Events" }
+        <spacer grow />
+
+        {/* Manage Events Button */}
+        <button appearance="primary" onPress={() => webView.mount()}>
+          {isModerator ? "Manage Events" : "View Events"}
         </button>
       </vstack>
     );
   },
 });
 
-export default Devvit; 
+export default Devvit;
