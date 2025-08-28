@@ -53,15 +53,15 @@ The Community Event Scheduler helps Reddit communities plan and manage events wi
 ## 📱 See It In Action
 
 ### Event Dashboard
-![View all upcoming events with countdown timers](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/view_events.png)
+![View all upcoming events with countdown timers](https://raw.githubusercontent.com/sandeshwar/event-scheduler/refs/heads/main/webroot/assets/app_images/view_events.png)
 *Your community's event hub - see all upcoming events at a glance*
 
 ### Create New Events
-![Simple event creation form](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/create_event.png)
+![Simple event creation form](https://raw.githubusercontent.com/sandeshwar/event-scheduler/refs/heads/main/webroot/assets/app_images/create_event.png)
 *Easy-to-use form to create any type of community event*
 
 ### Browse & Filter
-![Upcoming events with category filters](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/upcoming_events.png)
+![Upcoming events with category filters](https://raw.githubusercontent.com/sandeshwar/event-scheduler/refs/heads/main/webroot/assets/app_images/upcoming_events.png)
 *Find exactly what you're looking for with smart filtering*
 
 ## Getting Started
