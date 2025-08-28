@@ -1,148 +1,94 @@
-# Community Event Scheduler - Devvit App
+# Community Event Scheduler
 
-A comprehensive event management tool for Reddit communities that allows moderators and users to create, manage, and participate in community events directly within Reddit.
+**Organize events for your Reddit community - right inside Reddit!**
 
-## 🎯 Overview
+## What is this?
 
-The Community Event Scheduler is designed to enhance community engagement by providing a structured way to organize and participate in events. Built specifically for Reddit's Devvit platform, it integrates seamlessly with existing subreddit workflows while providing powerful event management capabilities.
+The Community Event Scheduler helps Reddit communities plan and manage events without leaving Reddit. Whether you're hosting an AMA, watch party, game night, or meetup, everything happens in one place.
 
-## ✨ Features
+## How to Use
 
-### Event Management
-- **Create Events**: Comprehensive event creation with title, description, date/time, location, and categories
-- **Interactive Display**: Events shown with countdown timers, RSVP functionality, and status indicators
-- **RSVP System**: One-click RSVP with attendance tracking and visual feedback
-- **Event Categories**: Organize events by type (AMA, Watch Party, Game Night, Discussion, Other)
-- **Real-time Updates**: Dynamic countdown timers and live status updates
+### For Community Members
+1. **Find Events**: Look for posts with "Open Event Scheduler" button
+2. **RSVP**: Click "RSVP" on any event you want to attend
+3. **Stay Updated**: See countdown timers and get notified when events start
+4. **Filter Events**: Browse by category (AMA, Gaming, Social, etc.)
 
-### User Experience
-- **Responsive Design**: Optimized for both desktop and mobile devices
-- **Intuitive Interface**: Clean, Reddit-themed design with easy navigation
-- **Filtering Options**: Filter events by category for better organization
-- **Status Tracking**: Clear indicators for upcoming, live, and ended events
+### For Event Creators
+1. **Create Events**: Click "Create Event" and fill in the details
+2. **Set Details**: Add title, description, time, location (Discord, Zoom, etc.)
+3. **Choose Category**: Select from 12 event types (AMA, Watch Party, Game Night, etc.)
+4. **Track Attendance**: See who's coming and manage your event
 
-### Moderation Tools
-- **Creator Controls**: Event creators can delete their own events
-- **Subreddit Integration**: Events are stored per-subreddit for proper isolation
-- **Easy Installation**: Simple menu item for moderators to create event scheduler posts
+### For Moderators
+- **Add to Your Subreddit**: Use "Create Community Event Scheduler" from your subreddit menu
+- **Manage Events**: Delete inappropriate events or help organize community activities
 
-## 🚀 Quick Start
+## Event Types Available
+- AMA (Ask Me Anything)
+- Watch Party
+- Game Night
+- Discussion
+- Meetup
+- Workshop
+- Social
+- Gaming
+- Sports
+- Educational
+- Entertainment
+- Other
 
-### Prerequisites
-- Reddit account with developer access
-- Devvit CLI installed (`npm install -g @devvit/cli`)
-- Node.js 18+ installed
+## Features You'll Love
+- **No Apps to Download**: Works entirely within Reddit
+- **Mobile Friendly**: Works great on phones and tablets
+- **Real-time Updates**: See live countdown timers
+- **Easy RSVP**: One-click to join events
+- **Organized**: Filter events by type to find what interests you
 
-### Installation
-1. Clone or download the project files
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Login to Devvit: `devvit login`
-5. Upload the app: `devvit upload`
-6. Test in your subreddit: `devvit playtest your-test-subreddit`
+## 📱 See It In Action
 
-### Usage
-1. **For Moderators**: Use "Create Community Event Scheduler" from the subreddit menu
-2. **For Users**: Click "Open Event Scheduler" on any event scheduler post
-3. **Creating Events**: Use the "Create Event" tab to add new events
-4. **Participating**: RSVP to events and track upcoming activities
+### Event Dashboard
+![View all upcoming events with countdown timers](src/assets/app_images/view_events.png)
+*Your community's event hub - see all upcoming events at a glance*
 
-## 🏗️ Technical Architecture
+### Create New Events
+![Simple event creation form](src/assets/app_images/create_event.png)
+*Easy-to-use form to create any type of community event*
 
-### Backend (Devvit Blocks)
-- **Custom Post Type**: Renders the event scheduler interface within Reddit posts
-- **Redis Storage**: Persistent storage for events, RSVPs, and user data
-- **Message Handling**: Processes communication between web view and backend
-- **Menu Integration**: Provides moderators with creation tools
+### Browse & Filter
+![Upcoming events with category filters](src/assets/app_images/upcoming_events.png)
+*Find exactly what you're looking for with smart filtering*
 
-### Frontend (Web View)
-- **Event Interface**: Interactive cards with countdown timers and RSVP buttons
-- **Creation Form**: Comprehensive form with validation and user feedback
-- **Navigation System**: Tab-based interface for viewing and creating events
-- **Responsive Design**: Mobile-optimized with touch-friendly interactions
+## Getting Started
 
-### Data Model
-```typescript
-export type Event = {
-  id: string;
-  title: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  category: string;
-  creator: string;
-  rsvps: RSVP[];
-  createdAt: string;
-}
+**For Moderators**: Want this in your subreddit? Ask your mod team to set it up using the "Create Community Event Scheduler" option.
 
-export type RSVP = {
-  userId: string;
-  timestamp: string;
-}
-```
+**For Users**: Just look for posts with "Open Event Scheduler" - no setup needed!
 
-## 🛡️ Compliance & Safety
+## Questions?
 
-### Compliance
-- ✅ Provides discrete, valuable functionality
-- ✅ Clear naming and accurate descriptions
-- ✅ Proper data handling and user privacy
-- ✅ No collection of sensitive information
-- ✅ Implements content validation and reporting mechanisms
+Events are organized by your subreddit moderators. Contact them if you have questions about specific events or want to suggest improvements.
 
-### Safety
-- Input validation prevents harmful content
-- User data limited to Reddit usernames for RSVP functionality
-- Proper error handling with user-friendly feedback
-- Integration with Reddit's existing moderation tools
+## Common Questions
 
-## 🔧 Development
+**How do I find events?**
+Look for posts in your subreddit with "Open Event Scheduler" button - these contain all upcoming events.
 
-### Project Structure
-```
-event-scheduler/
-├── src/
-│   ├── main.tsx          # Main app logic
-│   ├── createPost.tsx    # Menu item creation
-│   └── message.ts        # Type definitions
-├── webroot/
-│   ├── page.html         # Web view interface
-│   ├── style.css         # Styling
-│   └── script.js         # Client-side logic
-├── devvit.yaml           # App configuration
-└── package.json          # Dependencies
-```
+**Do I need to install anything?**
+No! Everything works within Reddit on both desktop and mobile.
 
-### Testing
-- Run `devvit playtest <subreddit>` for live testing
-- Monitor with `devvit logs <subreddit>`
+**Can I create events?**
+Yes! Just click "Create Event" and fill in the details. Events need a title, description, time, and category.
 
-### Building
-The app uses TypeScript and is built automatically by the Devvit platform during upload.
+**What if I need to change my RSVP?**
+You can RSVP or change your mind anytime before the event starts.
 
-## Future Improvements
+**How do I know when events are happening?**
+Each event shows a live countdown timer and status (upcoming, live, or ended).
 
-- Show list of users who have RSVP'd to an event
-- Allow users to un-rsvp from events
-- Moderators should be able to update/add/delete event categories
-- Add support for event reminders
-- Add support for recurring events
-- Support for updating event details
-- Option to upload event images (banner)
+**Can I filter events by type?**
+Yes! Use the category filter to find specific types like gaming events or AMAs.
 
 
 
-## 📄 License
-
-This project is licensed under the BSD-3-Clause License.
-
-## 🎉 Acknowledgments
-
-- Built with Reddit's Devvit platform
-- Created to enhance community engagement and organization
-
----
-
-**Ready to enhance your community's event organization? Install the Community Event Scheduler today!**
 

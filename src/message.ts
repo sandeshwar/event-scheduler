@@ -2,6 +2,7 @@
 export type DevvitMessage =
   | { type: 'initialData'; data: { username: string; events: Event[], isModerator: boolean } }
   | { type: 'eventCreated'; data: { event: Event; events: Event[] } }
+  | { type: 'eventUpdated'; data: { events: Event[] } }
   | { type: 'rsvpUpdated'; data: { events: Event[] } }
   | { type: 'eventDeleted'; data: { events: Event[] } };
 
@@ -9,6 +10,7 @@ export type DevvitMessage =
 export type WebViewMessage =
   | { type: 'webViewReady' }
   | { type: 'createEvent'; data: { title: string; description: string; startTime: string; endTime: string; location: string; category: string } }
+  | { type: 'updateEvent'; data: { eventId: string; title: string; description: string; startTime: string; endTime: string; location: string; category: string } }
   | { type: 'rsvpEvent'; data: { eventId: string } }
   | { type: 'deleteEvent'; data: { eventId: string } };
 

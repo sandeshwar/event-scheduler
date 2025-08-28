@@ -129,6 +129,47 @@ Devvit.addCustomPostType({
               `events_${postId}`,
               JSON.stringify(updatedEvents)
             );
+            webView.postMessage({
+              type: "eventCreated",
+              data: { event: newEvent, events: updatedEvents },
+            });
+            setRefreshTrigger((t) => t + 1);
+            break;
+          case "updateEvent":
+            const updatedEventsList = events.map((event: Event) => 
+              event.id === message.data.eventId 
+                ? { ...event, ...message.data, id: event.id, creator: event.creator, rsvps: event.rsvps, createdAt: event.createdAt }
+                : event
+            );
+            await context.redis.set(
+              `events_${postId}`,
+              JSON.stringify(updatedEventsList)
+            );
+            webView.postMessage({
+              type: "eventUpdated",
+              data: { events: updatedEventsList },
+            });
+            setRefreshTrigger((t) => t + 1);
+            break;
+          case "rsvpEvent":
+            const rsvpEvents = events.map((event: Event) => 
+              event.id === message.data.eventId 
+                ? { 
+                    ...event, 
+                    rsvps: event.rsvps.some((rsvp) => rsvp.userId === username) 
+                      ? event.rsvps.filter((rsvp) => rsvp.userId !== username)
+                      : [...event.rsvps, { userId: username ?? "<anon>", timestamp: new Date().toISOString() }] 
+                  }
+                : event
+            );
+            await context.redis.set(
+              `events_${postId}`,
+              JSON.stringify(rsvpEvents)
+            );
+            webView.postMessage({
+              type: "rsvpUpdated",
+              data: { events: rsvpEvents },
+            });
             setRefreshTrigger((t) => t + 1);
             break;
           case "deleteEvent":
@@ -139,6 +180,10 @@ Devvit.addCustomPostType({
               `events_${postId}`,
               JSON.stringify(filteredEvents)
             );
+            webView.postMessage({
+              type: "eventDeleted",
+              data: { events: filteredEvents },
+            });
             setRefreshTrigger((t) => t + 1);
             break;
         }
