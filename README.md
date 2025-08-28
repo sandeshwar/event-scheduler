@@ -9,22 +9,26 @@ The Community Event Scheduler helps Reddit communities plan and manage events wi
 ## How to Use
 
 ### For Community Members
+
 1. **Find Events**: Look for posts with "Open Event Scheduler" button
 2. **RSVP**: Click "RSVP" on any event you want to attend
 3. **Stay Updated**: See countdown timers and get notified when events start
 4. **Filter Events**: Browse by category (AMA, Gaming, Social, etc.)
 
 ### For Event Creators
+
 1. **Create Events**: Click "Create Event" and fill in the details
 2. **Set Details**: Add title, description, time, location (Discord, Zoom, etc.)
 3. **Choose Category**: Select from 12 event types (AMA, Watch Party, Game Night, etc.)
 4. **Track Attendance**: See who's coming and manage your event
 
 ### For Moderators
+
 - **Add to Your Subreddit**: Use "Create Community Event Scheduler" from your subreddit menu
 - **Manage Events**: Delete inappropriate events or help organize community activities
 
 ## Event Types Available
+
 - AMA (Ask Me Anything)
 - Watch Party
 - Game Night
@@ -39,6 +43,7 @@ The Community Event Scheduler helps Reddit communities plan and manage events wi
 - Other
 
 ## Features You'll Love
+
 - **No Apps to Download**: Works entirely within Reddit
 - **Mobile Friendly**: Works great on phones and tablets
 - **Real-time Updates**: See live countdown timers
@@ -48,15 +53,15 @@ The Community Event Scheduler helps Reddit communities plan and manage events wi
 ## 📱 See It In Action
 
 ### Event Dashboard
-![View all upcoming events with countdown timers](src/assets/app_images/view_events.png)
+![View all upcoming events with countdown timers](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/view_events.png)
 *Your community's event hub - see all upcoming events at a glance*
 
 ### Create New Events
-![Simple event creation form](src/assets/app_images/create_event.png)
+![Simple event creation form](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/create_event.png)
 *Easy-to-use form to create any type of community event*
 
 ### Browse & Filter
-![Upcoming events with category filters](src/assets/app_images/upcoming_events.png)
+![Upcoming events with category filters](https://raw.githubusercontent.com/sandeshwarsharma/reddit-event-scheduler/main/src/assets/app_images/upcoming_events.png)
 *Find exactly what you're looking for with smart filtering*
 
 ## Getting Started
@@ -88,7 +93,3 @@ Each event shows a live countdown timer and status (upcoming, live, or ended).
 
 **Can I filter events by type?**
 Yes! Use the category filter to find specific types like gaming events or AMAs.
-
-
-
-
